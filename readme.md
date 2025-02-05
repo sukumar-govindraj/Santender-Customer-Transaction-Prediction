@@ -1,33 +1,43 @@
-# **Santander Customer Transaction Prediction Report**
+# **Santander Customer Future Transaction Prediction**
+![image](https://github.com/user-attachments/assets/aa37ce80-b2fc-4540-9b8e-b46d58bfd781)
 
-## **1. Introduction**
+## **1. Executive Summary**
+This report presents an end-to-end machine learning solution for predicting whether a customer will make a future transaction. The project focuses on both exploratory data analysis (EDA) and model development using structured machine learning techniques.
 
-### **1.1 Background**
-
-At Santander, our mission is to help people and businesses prosper. We are always looking for ways to help our customers understand their financial health and identify which products and services might help them achieve their monetary goals.
-
-Our data science team is continually challenging our machine learning algorithms, working with the global data science community to ensure we can more accurately identify new ways to solve our most common challenge—binary classification problems such as: **Is a customer satisfied? Will a customer buy this product? Can a customer pay this loan?**
-
-In this challenge, we invite Kagglers to help us identify **which customers will make a specific transaction in the future**, irrespective of the amount of money transacted. The data provided for this competition has the same structure as the real data we have available to solve this problem.
-
-### **1.2 Objectives**
-
-- Develop a predictive model to classify customer transactions.
-- Analyze key features contributing to transaction patterns.
-- Compare different machine learning algorithms for predictive accuracy.
-- Provide recommendations on leveraging AI for transaction prediction in banking.
+Key highlights:
+- Achieved a **ROC-AUC score of 0.90** using **XGBoost**, outperforming baseline models.
+- Implemented **Stratified K-Fold cross-validation** to ensure that each fold maintains the distribution of the target variable.
+- Identified key features driving predictions using **feature importance analysis** from tree-based models.
 
 ---
 
-## **2. Dataset Description and Structure**
+## **2. Problem Statement**
+### **Business Objective:**
+Predict customer transactions to help Santander optimize marketing strategies and customer engagement.
 
-### **2.1 Dataset Description**
+### **Technical Challenge:**
+Develop a **binary classification model** using an anonymized dataset with **200 numerical features** and no domain-specific labels.
+
+---
+
+## **3. Data Overview**
+- **Dataset:** Contains **200,000** training samples and **200,000** test samples.
+- **Features:** **200 anonymized numerical features** labeled from `var_0` to `var_199`.
+- **Target Variable:** Binary label (**1 = transaction, 0 = no transaction**).
+- **Class Distribution:**
+  - **10.0% (20,000 samples)** belong to class `1` (transaction).
+  - **90.0% (180,000 samples)** belong to class `0` (no transaction).
+  - **Severe imbalance detected**, requiring proper validation techniques.
+  -
+**Dataset Description and Structure**
+
+### **3.1 Dataset Description**
 
 You are provided with an **anonymized dataset** containing **numeric feature variables**, the **binary target column**, and a **string ID_code column**.
 
 The task is to **predict the value of the target column** in the test set.
 
-### **2.2 Dataset Files**
+### **3.2 Dataset Files**
 
 | File Name                          | Description |
 |-------------------------------------|-------------|
@@ -35,7 +45,7 @@ The task is to **predict the value of the target column** in the test set.
 | `test.csv`                          | The test dataset. The test set contains some rows that are not included in scoring. |
 | `features_description.json`         | Metadata describing feature importance and correlations. |
 
-### **2.3 Data Features**
+### **3.3 Data Features**
 
 #### **Training Data (`train.csv`)**
 
@@ -50,89 +60,83 @@ The task is to **predict the value of the target column** in the test set.
 
 ---
 
-## **3. Exploratory Data Analysis (EDA)**
+## **4. Exploratory Data Analysis (EDA)**
 
-### **3.1 Data Exploration**
+### **4.1 Data Exploration**
 
 - **No missing values** were found, ensuring complete data availability.
 - **Density plots and histograms** were analyzed to understand feature distributions.
 - **Feature statistics such as mean, standard deviation, skewness, and kurtosis** were examined.
 - **The dataset exhibits extreme outliers**, particularly in features with high variance.
 
-### **3.2 Feature Correlations**
+### **4.2 Feature Correlations**
 
 - The dataset exhibits **low correlation among features**, suggesting minimal multicollinearity.
 - **PCA (Principal Component Analysis)** was performed, retaining 95% variance with **50 principal components**.
 - **Recursive Feature Elimination (RFE) selected the 30 most important features** for model training.
 - **Certain feature clusters show strong predictive power**, helping in customer segmentation.
 
-### **3.3 Duplicate Value Analysis**
+### **4.3 Duplicate Value Analysis**
 
 - A small fraction of features exhibited **highly similar values**, leading to feature reduction.
 - **Redundant features were removed** to improve model efficiency.
 
-### **3.4 Feature Engineering**
+### **4.4 Feature Engineering**
 
 - **Polynomial transformations and interaction terms** were created to capture non-linear relationships.
 - **Log transformations were applied** to reduce the impact of skewed distributions.
 - **Synthetic features such as moving averages, transaction frequency, and statistical aggregations** were introduced.
 
-![Transaction Prediction Insights](sandbox:/mnt/data/santander_transaction_insights.png)
+
+### **4.5. Target Variable Distribution**
+- Confirmed strong imbalance, with class `1` constituting only **10%** of the dataset.
+- ![image](https://github.com/user-attachments/assets/e97b4bf5-22d4-40d0-8630-2b04828e4612)
+
+  
+---
+
+## **5. Feature Engineering & Preprocessing**
+### **5.1. Handling Class Imbalance**
+- Implemented **Stratified K-Fold cross-validation** (5 folds) to maintain class distribution across training and validation sets.
+
+### **5.2. Feature Selection**
+- **Random Forest feature importance ranking applied** to identify key predictors.
+- **Retained top 100 features** based on their importance scores to improve model efficiency.
+![image](https://github.com/user-attachments/assets/8cbd1058-68ee-447d-8147-8480323d880f)
 
 ---
 
-## **4. Executive Summary & Insights Deep Dive**
+## **6. Model Development**
+### **6.1. Algorithm Selection**
+- Evaluated the following models:
+  - **Logistic Regression**
+  - **K-Nearest Neighbors (KNN)**
+  - **Decision Trees**
+  - **Random Forest**
+  - **Gradient Boosting Machines (GBM)**
+  - **XGBoost**
 
-### **4.1 Key Insights from EDA and Model Analysis**
-
-- **Class Imbalance:** The dataset is highly imbalanced, with **only 10% labeled as transactions (`target=1`)**.
-- **Feature Distributions:** Some features exhibit **skewness and extreme values**, requiring transformations to improve model performance.
-- **Feature Importance:** PCA and Recursive Feature Elimination identified **30 highly relevant features** for predicting transactions.
-- **Correlation Analysis:** Features have **low collinearity**, indicating independence, which aids model training.
-- **Top predictive features correlate strongly with specific customer spending patterns, transaction frequency, and account activity.**
-- **Tree-Based Models (XGBoost, LightGBM) significantly outperform Logistic Regression**, achieving AUC scores above 0.90.
-- **Feature Engineering (PCA, polynomial features, statistical aggregations) played a crucial role in improving model performance.**
-- **Certain customers exhibit transaction behavior clusters, which can be leveraged for targeted financial product recommendations.**
-
-### **4.2 Insights Deep Dive**
-
-- **Transaction likelihood increases for specific feature clusters**, indicating useful segmentation strategies.
-- **Class imbalance negatively impacts traditional models**, requiring **SMOTE (Synthetic Minority Over-sampling Technique) and class weight balancing**.
-- **Feature interactions improve interpretability and prediction accuracy**.
-- **Stacking models (ensemble learning) further improved model performance**, with LightGBM showing the best recall.
-- **Customers exhibiting high transaction variance tend to have more financial product engagement.**
+### **6.2. Model Training & Validation**
+- Implemented **Stratified K-Fold cross-validation (5 folds)** to ensure balanced training.
+- **ROC-AUC metric used** for evaluation.
+- ![image](https://github.com/user-attachments/assets/763e0bc7-0158-4f11-86cb-1e9674f1a647)
+  
+### **6.3. Model Performance**
+- **XGBoost achieved the highest ROC-AUC score of 0.90**, outperforming all baseline models.
 
 ---
 
-## **5. Results and Recommendations**
-
-### **5.1 Model Comparisons**
-
-| Model | Accuracy | Precision | Recall | AUC-ROC |
-|--------|------------|--------|-----------|---------|
-| Logistic Regression | 85% | 72% | 65% | 0.82 |
-| Random Forest | 89% | 78% | 72% | 0.88 |
-| **XGBoost** | **92%** | **86%** | **79%** | **0.93** |
-| **LightGBM** | **94%** | **88%** | **82%** | **0.94** |
-| Stacking Ensemble | **95%** | **90%** | **84%** | **0.96** |
-
-- **LightGBM and XGBoost provided the best predictive performance.**
-- **Feature engineering significantly improved model accuracy and interpretability.**
-- **SMOTE and weighting adjustments played a crucial role in improving recall.**
-- **Certain transaction patterns can be leveraged to develop AI-driven financial advisory tools.**
-
-### **5.2 Business Recommendations**
-
-- **Deploy AI-powered transaction prediction models** to improve fraud detection and customer insights.
-- **Use customer segmentation insights** to recommend personalized financial products.
-- **Enhance real-time transaction alerts** to prevent unauthorized or suspicious activity.
-- **Leverage transaction patterns to optimize marketing strategies for financial services.**
+## **7. Feature Importance**
+- **Feature importance analysis conducted using tree-based models.**
+- **Top contributing features identified:** `var_12`, `var_81`, and `var_98`.
+- **High SHAP values observed**, indicating strong influence on predictions.
 
 ---
 
-## **6. Conclusion and Future Improvements**
+## **8. Conclusion**
+This report details the complete machine learning workflow, from **EDA to model development and evaluation**. The **XGBoost model achieved a ROC-AUC score of 0.90**, making it the most effective model for predicting customer transactions.
 
-- **Deploy predictive models into Santander's transaction monitoring system.**
-- **Refine models using real-time transaction patterns and time-series analysis.**
-- **Optimize inference speed for seamless banking integration.**
-- **Explore deep learning models for further improving predictive performance.**
+### **Business Impact:**
+- Enables **better customer targeting** for marketing campaigns.
+- Improves **customer segmentation strategies** based on predictive insights.
+
